@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, send_file
 from PIL import Image
 import os
 
+
 app = Flask(__name__)
 UPLOAD_FOLDER = "static/uploads"
 OUTPUT_FOLDER = "static/output"
@@ -92,4 +93,6 @@ def download():
         return "No adjusted image available for download."
     return send_file(output_path, as_attachment=True)
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Use the PORT environment variable if available; otherwise, default to 5000
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host="0.0.0.0", port=port)
