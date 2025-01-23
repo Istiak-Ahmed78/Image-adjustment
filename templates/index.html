@@ -72,7 +72,13 @@
             height: 100%;
             z-index: 2;
         }
-
+        .note {
+  text-align: center; /* Center the text within the paragraph */
+  margin-top: 30px; /* Add some top margin for spacing */
+  font-size: 0.8em; /* Adjust font size if needed */
+  color: #666; /* Set a color for the note */
+  margin-bottom: 10px;
+}
         #uploaded-image {
             position: absolute;
             top: 0;
@@ -123,7 +129,7 @@
     </style>
 </head>
 <body>
-    <h1>Image Adjustment</h1>
+    <h1>হ-য-ব-র-ল সাগরপথে, স্মৃতি তৈরী ঢেউয়ের সাথে।</h1>
 
     <form method="post" enctype="multipart/form-data">
         <input type="file" name="file" required>
@@ -142,11 +148,13 @@
         <button onclick="moveImage('right')">Right</button>
         <button onclick="moveImage('down')">Down</button>
     </div>
+    <p class="note">Please wait for one second after saving before clicking download.</p>
 
     <div class="download-container">
         <button onclick="adjustImage()">Save Adjustments</button>
         <a href="/download"><button>Download</button></a>
     </div>
+    
     {% endif %}
 
     <script>
