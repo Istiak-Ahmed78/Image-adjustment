@@ -32,34 +32,64 @@ def adjust():
     image_path = os.path.join(UPLOAD_FOLDER, data["uploaded_image"])
     output_path = os.path.join(OUTPUT_FOLDER, "output.png")
 
-    frame_image = Image.open(STATIC_FRAME).convert("RGBA")
-    user_image = Image.open(image_path).convert("RGBA")
+    try:
+        # Load frame and user images
+        frame_image = Image.open(STATIC_FRAME).convert("RGBA")
+        user_image = Image.open(image_path).convert("RGBA")
 
-    # Resize user image to fit the frame dimensions
-    user_image = user_image.resize(frame_image.size, Image.Resampling.LANCZOS)
+        # Resize user image to match the frame dimensions
+        user_image = user_image.resize(frame_image.size, Image.Resampling.LANCZOS)
 
-    # Get adjustment offsets
-    offset_x = int(data.get("offsetX", 0))
-    offset_y = int(data.get("offsetY", 0))
+        # Get adjustment offsets
+        offset_x = int(data.get("offsetX", 0))*2
+        offset_y = int(data.get("offsetY", 0))*2
+        if offset_x > 0:
+            offset_x += 8
+        elif offset_x < 0:
+            offset_x -= 8
 
-    # Create a blank canvas with the same size as the frame
-    combined = Image.new("RGBA", frame_image.size)
+        if offset_y > 0:
+            offset_y += 8
+        elif offset_y < 0:
+            offset_y -= 8
+        # Create a blank canvas with transparency
+        combined = Image.new("RGBA", frame_image.size, (255, 255, 255, 0))
 
-    # Paste the user image at the adjusted position
-    combined.paste(user_image, (offset_x, offset_y), user_image)
+        # Paste the user image at the adjusted position
+        combined.paste(user_image, (offset_x, offset_y), user_image)
 
-    # Overlay the frame on top
-    combined.paste(frame_image, (0, 0), frame_image)
+        # Overlay the frame on top
+        combined.paste(frame_image, (0, 0), frame_image)
 
-    # Save the final combined image
-    combined.save(output_path, "PNG")
+        # Placeholder: Trigger a popup on the front-end here
+        # Example: Call a JavaScript function to show a "Saving..." message
 
-    return {"output_image": "/" + output_path}
+        if os.path.exists(output_path):
+            os.remove(output_path)
+            print(f"{output_path} has been deleted.")
+        else:
+            print(f"{output_path} does not exist.")
+        # Save the final combined image
+        combined.save(output_path, "PNG")
+
+        # Debugging info
+        print(f"Offsets: X={offset_x}, Y={offset_y}")
+        print(f"Output saved at: {output_path}")
+
+        return {"success": True, "output_image": "/" + output_path}
+    except Exception as e:
+        print(f"Error during adjustment: {e}")
+        return {"success": False, "error": str(e)}
+
+
+
 
 @app.route("/download")
 def download():
     output_path = os.path.join(OUTPUT_FOLDER, "output.png")
+    print(output_path)
+    if not os.path.exists(output_path):
+        return "No adjusted image available for download."
     return send_file(output_path, as_attachment=True)
-
 if __name__ == "__main__":
     app.run(debug=True)
